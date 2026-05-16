@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Resume Editor</title>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #4a9eff;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .section {
+            background: #2a2a2a;
+            border: 2px solid #3a3a3a;
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #6ab7ff;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        /* Tab Styles */
+        .tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #888;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .tab.active {
+            background: #4a9eff;
+            border-color: #4a9eff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Input Styles */
+        input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a1a;
+            border: 2px solid #444;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            border-radius: 5px;
+            font-size: 13px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #4a9eff;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            margin-top: 10px;
+            margin-right: 10px;
+        }
+
+        .btn-green {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #218838;
+        }
+
+        .btn-blue {
+            background: #4a9eff;
+            color: white;
+        }
+
+        .btn-blue:hover {
+            background: #3a8eef;
+        }
+
+        .btn-red {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-red:hover {
+            background: #c82333;
+        }
+
+        /* Status */
+        .status {
+            margin-top: 10px;
+            font-weight: bold;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .success {
+            color: #28a745;
+            background: #1a2e1a;
+        }
+
+        .error {
+            color: #dc3545;
+            background: #2e1a1a;
+        }
+
+        .loading {
+            color: #ffc107;
+            background: #2e2a1a;
+        }
+
+        /* Layout */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Code Display */
+        #latexCode {
+            background: #1a1a1a;
+            border: 2px solid #444;
+            padding: 15px;
+            overflow: auto;
+            height: 500px;
+            border-radius: 5px;
+            color: #6ab7ff;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre;
+        }
+
+        /* Instruction box */
+        #instruction {
+            margin-bottom: 10px;
+        }
+
+        /* Connection status */
+        #connectionStatus {
+            text-align: center;
+            padding: 8px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .connected {
+            background: #1a2e1a;
+            color: #28a745;
+            border: 1px solid #28a745;
+        }
+
+        .disconnected {
+            background: #2e1a1a;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+
+        /* Copy button */
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>AI Resume Editor</h1>
+        <p class="subtitle">Powered by phi3:mini (Local AI - No internet required)</p>
+
+        <!-- Connection Status -->
+        <div id="connectionStatus">Checking backend connection...</div>
+
+        <!-- Step 1: Input Resume -->
+        <div class="section">
+            <h2>Step 1: Load Your Resume</h2>
+
+            <!-- Tabs -->
+            <div class="tab-container">
+                <div class="tab active" onclick="switchTab('upload')">
+                    Upload .tex File
+                </div>
+                <div class="tab" onclick="switchTab('paste')">
+                    Paste LaTeX Code
+                </div>
+            </div>
+
+            <!-- Tab 1: File Upload -->
+            <div id="tab-upload" class="tab-content active">
+                <input type="file" id="fileInput" accept=".tex" />
+                <br>
+                <button class="btn btn-green" onclick="uploadResume()">
+                    Upload Resume
+                </button>
+                <p id="uploadStatus" class="status" style="display:none;"></p>
+            </div>
+
+            <!-- Tab 2: Paste Code -->
+            <div id="tab-paste" class="tab-content">
+                <textarea id="pasteInput" rows="15" placeholder="Paste your LaTeX code here...
+
+Example:
+\documentclass{article}
+\begin{document}
+
+\section{Skills}
+Python, Java, AWS, Docker
+
+\section{Experience}
+Software Engineer at Company
+- Worked on Python projects
+- Used Machine Learning
+
+\end{document}">
+                </textarea>
+                <br>
+                <button class="btn btn-green" onclick="pasteResume()">
+                    Load Pasted Code
+                </button>
+                <p id="pasteStatus" class="status" style="display:none;"></p>
+            </div>
+        </div>
+
+        <!-- Step 2: Edit Resume -->
+        <div class="section">
+            <h2>Step 2: Edit Your Resume with AI</h2>
+            <textarea id="instruction" rows="4"
+                placeholder="Enter your editing instruction. Examples:&#10;&#10;- Make Python and AWS bold&#10;- Highlight my machine learning skills&#10;- Remove outdated technologies&#10;- Rewrite experience to sound more professional&#10;- Emphasize leadership experience&#10;- Tailor resume for data science role">
+            </textarea>
+            <br>
+            <button class="btn btn-blue" onclick="editResume()">
+                Edit with AI
+            </button>
+            <button class="btn btn-red" onclick="resetResume()">
+                Reset to Original
+            </button>
+            <p id="editStatus" class="status" style="display:none;"></p>
+        </div>
+
+        <!-- Step 3: View Result -->
+        <div class="section">
+            <div class="code-header">
+                <h2>Step 3: View and Copy LaTeX Code</h2>
+                <button class="btn btn-blue" onclick="copyCode()">
+                    Copy Code
+                </button>
+            </div>
+            <pre id="latexCode">Your resume will appear here after uploading or pasting...</pre>
+        </div>
+
+    </div>
+
+    <script>
+        let resumeId = null;
+        const API = 'http://localhost:8000';
+
+        // ============= TAB SWITCHING =============
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+
+            // Activate selected tab
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+        }
+
+        // ============= UPLOAD FILE =============
+        async function uploadResume() {
+            const file = document.getElementById('fileInput').files[0];
+            if (!file) {
+                alert('Please select a .tex file first');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            showStatus('uploadStatus', 'Uploading...', 'loading');
+
+            try {
+                const res = await fetch(`${API}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+                resumeId = data.resume_id;
+
+                showStatus('uploadStatus', 'Upload successful! Resume ID: ' + resumeId, 'success');
+                loadResume();
+            } catch (e) {
+                showStatus('uploadStatus', 'Error: ' + e, 'error');
+            }
+        }
+
+        // ============= PASTE CODE =============
+        async function pasteResume() {
+            const pastedCode = document.getElementById('pasteInput').value.trim();
+
+            if (!pastedCode) {
+                alert('Please paste your LaTeX code first');
+                return;
+            }
+
+            if (!pastedCode.includes('\\documentclass') && !pastedCode.includes('\\begin')) {
+                alert('This does not look like LaTeX code. Please paste valid LaTeX.');
+                return;
+            }
+
+            showStatus('pasteStatus', 'Loading pasted code...', 'loading');
+
+            try {
+                // Create a blob and upload as file
+                const blob = new Blob([pastedCode], { type: 'text/plain' });
+                const file = new File([blob], 'pasted_resume.tex', { type: 'text/plain' });
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const res = await fetch(`${API}/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await res.json();
+                resumeId = data.resume_id;
+
+                showStatus('pasteStatus', 'LaTeX code loaded successfully!', 'success');
+                document.getElementById('latexCode').textContent = pastedCode;
+            } catch (e) {
+                showStatus('pasteStatus', 'Error: ' + e, 'error');
+            }
+        }
+
+        // ============= LOAD RESUME =============
+        async function loadResume() {
+            if (!resumeId) return;
+
+            try {
+                const res = await fetch(`${API}/resume/${resumeId}`);
+                const data = await res.json();
+                document.getElementById('latexCode').textContent = data.latex_code;
+            } catch (e) {
+                console.error('Error loading resume:', e);
+            }
+        }
+
+        // ============= EDIT RESUME =============
+        async function editResume() {
+            if (!resumeId) {
+                alert('Please upload or paste a resume first!');
+                return;
+            }
+
+            const instruction = document.getElementById('instruction').value.trim();
+            if (!instruction) {
+                alert('Please enter an editing instruction');
+                return;
+            }
+
+            showStatus('editStatus', 'AI is editing your resume... (This may take 3-5 minutes for large resumes)', 'loading');
+
+            try {
+                const res = await fetch(`${API}/edit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        resume_id: resumeId,
+                        instruction: instruction
+                    })
+                });
+
+                const data = await res.json();
+                document.getElementById('latexCode').textContent = data.latex_code;
+                showStatus('editStatus', 'Edit completed successfully!', 'success');
+            } catch (e) {
+                showStatus('editStatus', 'Error: ' + e, 'error');
+            }
+        }
+
+        // ============= RESET RESUME =============
+        async function resetResume() {
+            if (!resumeId) {
+                alert('No resume loaded!');
+                return;
+            }
+
+            if (!confirm('Reset to original? All edits will be lost!')) return;
+
+            try {
+                const res = await fetch(`${API}/reset/${resumeId}`, {
+                    method: 'POST'
+                });
+                const data = await res.json();
+                document.getElementById('latexCode').textContent = data.latex_code;
+                showStatus('editStatus', 'Reset to original!', 'success');
+            } catch (e) {
+                showStatus('editStatus', 'Error: ' + e, 'error');
+            }
+        }
+
+        // ============= COPY CODE =============
+        function copyCode() {
+            const code = document.getElementById('latexCode').textContent;
+            if (!code || code.includes('Your resume will appear')) {
+                alert('No code to copy!');
+                return;
+            }
+            navigator.clipboard.writeText(code).then(() => {
+                alert('LaTeX code copied to clipboard!');
+            });
+        }
+
+        // ============= HELPER =============
+        function showStatus(elementId, message, type) {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = 'status ' + type;
+            el.style.display = 'block';
+        }
+
+        // ============= CHECK CONNECTION =============
+        async function checkConnection() {
+            try {
+                const res = await fetch(`${API}/api/health`);
+                const data = await res.json();
+
+                const statusEl = document.getElementById('connectionStatus');
+                if (data.status === 'ok') {
+                    statusEl.textContent = 'Backend connected - phi3:mini ready';
+                    statusEl.className = 'connected';
+                } else {
+                    statusEl.textContent = 'Backend connected but Ollama not ready';
+                    statusEl.className = 'disconnected';
+                }
+            } catch (e) {
+                const statusEl = document.getElementById('connectionStatus');
+                statusEl.textContent = 'Cannot connect to backend on port 8000. Run: py app.py';
+                statusEl.className = 'disconnected';
+            }
+        }
+
+        // Check on load
+        checkConnection();
+    </script>
+</body>
+
+</html>
