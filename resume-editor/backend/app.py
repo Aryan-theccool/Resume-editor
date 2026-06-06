@@ -116,7 +116,12 @@ async def edit_resume(request: EditRequest):
         'action verbs', 'summary', 'format', 'proofread', 'rephrase',
         'restructure', 'overhaul', 'ats', 'optimize'
     }
-    is_complex = any(kw in instruction for kw in COMPLEX_KEYWORDS)
+    
+    # Identify if user is combining multiple operations (e.g. "remove X and add Y")
+    action_verbs = ['add', 'remove', 'delete', 'change', 'replace', 'bold', 'highlight']
+    has_multiple_actions = sum(1 for verb in action_verbs if verb in instruction) > 1
+    
+    is_complex = any(kw in instruction for kw in COMPLEX_KEYWORDS) or has_multiple_actions
 
     # ── Pattern matching (broad, catches natural language variants) ──
 
@@ -281,7 +286,7 @@ async def edit_resume(request: EditRequest):
 
     # ── Route to correct handler ──────────────────────────────────────
 
-    if "bold" in instruction:
+    if "bold" in instruction and not is_complex:
         words = request.instruction.split()
         for i, word in enumerate(words):
             if word.lower() in ["make", "bold"]:
@@ -292,7 +297,7 @@ async def edit_resume(request: EditRequest):
                     modified = re.sub(pattern, replacement, modified)
                     print(f"[FAST] Made '{target}' bold")
 
-    elif "remove" in instruction or "delete" in instruction:
+    elif ("remove" in instruction or "delete" in instruction) and not is_complex:
         words = request.instruction.split()
         for i, word in enumerate(words):
             if word.lower() in ["remove", "delete"]:
@@ -302,7 +307,7 @@ async def edit_resume(request: EditRequest):
                     modified = '\n'.join([l for l in doc_lines if target.lower() not in l.lower()])
                     print(f"[FAST] Removed lines containing '{target}'")
 
-    elif "highlight" in instruction:
+    elif "highlight" in instruction and not is_complex:
         words = request.instruction.split()
         for i, word in enumerate(words):
             if word.lower() == "highlight":

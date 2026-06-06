@@ -1,432 +1,894 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Resume Editor — Local</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0d0f17;--surface:#131620;--card:#1a1d2e;--border:#252840;
-  --accent:#6366f1;--accent2:#8b5cf6;--green:#10b981;--red:#ef4444;
-  --yellow:#f59e0b;--text:#e2e8f0;--muted:#64748b;--code:#a78bfa;
-}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Resume Editor — Local</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
 
-/* ── Animated background ── */
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 20%,rgba(99,102,241,.12) 0,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 80%,rgba(139,92,246,.08) 0,transparent 60%);pointer-events:none;z-index:0}
+    :root {
+      --bg: #0d0f17;
+      --surface: #131620;
+      --card: #1a1d2e;
+      --border: #252840;
+      --accent: #6366f1;
+      --accent2: #8b5cf6;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --code: #a78bfa;
+    }
 
-.wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:24px}
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
 
-/* ── Header ── */
-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:20px}
-.logo-text h1{font-size:20px;font-weight:700;background:linear-gradient(135deg,#e2e8f0,#a5b4fc);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.logo-text p{font-size:12px;color:var(--muted);margin-top:1px}
-#connBadge{display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:500;border:1px solid var(--border);background:var(--card);transition:.3s}
-#connBadge .dot{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:.3s}
-#connBadge.ok{border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.08);color:var(--green)}
-#connBadge.ok .dot{background:var(--green);box-shadow:0 0 6px var(--green)}
-#connBadge.err{border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.08);color:var(--red)}
-#connBadge.err .dot{background:var(--red)}
+    /* ── Animated background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 20% 20%, rgba(99, 102, 241, .12) 0, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139, 92, 246, .08) 0, transparent 60%);
+      pointer-events: none;
+      z-index: 0
+    }
 
-/* ── Layout ── */
-.layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
-@media(max-width:900px){.layout{grid-template-columns:1fr}}
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px
+    }
 
-/* ── Cards ── */
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(99,102,241,.4),transparent)}
-.card-title{font-size:14px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:18px;display:flex;align-items:center;gap:8px}
-.card-title span{font-size:16px}
+    /* ── Header ── */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border)
+    }
 
-/* ── Tabs ── */
-.tabs{display:flex;gap:4px;margin-bottom:18px;background:rgba(255,255,255,.04);padding:4px;border-radius:10px}
-.tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;border-radius:7px;cursor:pointer;color:var(--muted);transition:.2s;border:none;background:transparent}
-.tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 12px rgba(99,102,241,.4)}
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px
+    }
 
-/* ── Inputs ── */
-textarea,input[type=file]{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:12px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;resize:vertical;transition:.2s;outline:none}
-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.15)}
-input[type=file]{font-family:'Inter',sans-serif;cursor:pointer}
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px
+    }
 
-/* ── Buttons ── */
-.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border:none;border-radius:9px;font-weight:600;font-size:14px;cursor:pointer;transition:.2s;white-space:nowrap}
-.btn:active{transform:scale(.97)}
-.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 4px 15px rgba(99,102,241,.3)}
-.btn-primary:hover{box-shadow:0 6px 20px rgba(99,102,241,.45)}
-.btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--border)}
-.btn-ghost:hover{background:rgba(255,255,255,.1)}
-.btn-danger{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.2)}
-.btn-danger:hover{background:rgba(239,68,68,.2)}
-.btn-success{background:rgba(16,185,129,.12);color:var(--green);border:1px solid rgba(16,185,129,.2)}
-.btn-success:hover{background:rgba(16,185,129,.2)}
-.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+    .logo-text h1 {
+      font-size: 20px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e2e8f0, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent
+    }
 
-.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .logo-text p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 1px
+    }
 
-/* ── Status ── */
-.status{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;display:none;animation:fadeIn .3s}
-.status.loading{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.2)}
-.status.success{background:rgba(16,185,129,.1);color:var(--green);border:1px solid rgba(16,185,129,.2)}
-.status.error{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.2)}
+    #connBadge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: var(--card);
+      transition: .3s
+    }
 
-/* ── Quick Actions ── */
-.qa-title{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin:16px 0 10px}
-.qa-grid{display:flex;flex-wrap:wrap;gap:7px}
-.qa-btn{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;transition:.2s}
-.qa-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(99,102,241,.08)}
+    #connBadge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--muted);
+      transition: .3s
+    }
 
-/* ── Code viewer ── */
-.code-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
-.code-meta{display:flex;gap:10px;align-items:center}
-.version-badge{font-size:12px;padding:3px 10px;border-radius:12px;background:rgba(99,102,241,.15);color:var(--accent);font-weight:600;border:1px solid rgba(99,102,241,.2)}
-#codeBox{background:rgba(0,0,0,.3);border:1px solid var(--border);padding:18px;overflow:auto;height:520px;border-radius:12px;color:var(--code);font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.7;white-space:pre;tab-size:2}
-.placeholder{color:var(--muted);font-family:'Inter',sans-serif;font-size:14px;text-align:center;padding:60px 20px}
-.placeholder .ph-icon{font-size:48px;margin-bottom:12px}
+    #connBadge.ok {
+      border-color: rgba(16, 185, 129, .3);
+      background: rgba(16, 185, 129, .08);
+      color: var(--green)
+    }
 
-/* ── Stats bar ── */
-.stats-bar{display:flex;gap:16px;margin-top:10px;flex-wrap:wrap}
-.stat{font-size:12px;color:var(--muted)}
-.stat strong{color:var(--text);font-weight:600}
+    #connBadge.ok .dot {
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green)
+    }
 
-/* ── History sidebar ── */
-.history-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-top:10px}
-.history-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;border:1px solid var(--border);font-size:12px;background:rgba(255,255,255,.03)}
-.history-item .v{min-width:24px;height:24px;border-radius:6px;background:rgba(99,102,241,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px}
-.history-item .instr{flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.history-item .ts{color:var(--muted);flex-shrink:0}
-.history-item.current{border-color:rgba(99,102,241,.4);background:rgba(99,102,241,.07)}
+    #connBadge.err {
+      border-color: rgba(239, 68, 68, .3);
+      background: rgba(239, 68, 68, .08);
+      color: var(--red)
+    }
 
-/* ── Spinner ── */
-@keyframes spin{to{transform:rotate(360deg)}}
-.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+    #connBadge.err .dot {
+      background: var(--red)
+    }
 
-/* ── Divider ── */
-.divider{height:1px;background:var(--border);margin:18px 0}
+    /* ── Layout ── */
+    .layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      align-items: start
+    }
 
-/* ── Scrollbar ── */
-::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
-</style>
+    @media(max-width:900px) {
+      .layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(99, 102, 241, .4), transparent)
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .card-title span {
+      font-size: 16px
+    }
+
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 18px;
+      background: rgba(255, 255, 255, .04);
+      padding: 4px;
+      border-radius: 10px
+    }
+
+    .tab {
+      flex: 1;
+      padding: 9px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 7px;
+      cursor: pointer;
+      color: var(--muted);
+      transition: .2s;
+      border: none;
+      background: transparent
+    }
+
+    .tab.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 12px rgba(99, 102, 241, .4)
+    }
+
+    /* ── Inputs ── */
+    textarea,
+    input[type=file] {
+      width: 100%;
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      resize: vertical;
+      transition: .2s;
+      outline: none
+    }
+
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, .15)
+    }
+
+    input[type=file] {
+      font-family: 'Inter', sans-serif;
+      cursor: pointer
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: .2s;
+      white-space: nowrap
+    }
+
+    .btn:active {
+      transform: scale(.97)
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, .3)
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 6px 20px rgba(99, 102, 241, .45)
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, .06);
+      color: var(--text);
+      border: 1px solid var(--border)
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, .1)
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, .12);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .2)
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, .2)
+    }
+
+    .btn-success {
+      background: rgba(16, 185, 129, .12);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, .2)
+    }
+
+    .btn-success:hover {
+      background: rgba(16, 185, 129, .2)
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px
+    }
+
+    /* ── Status ── */
+    .status {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+      animation: fadeIn .3s
+    }
+
+    .status.loading {
+      background: rgba(245, 158, 11, .1);
+      color: var(--yellow);
+      border: 1px solid rgba(245, 158, 11, .2)
+    }
+
+    .status.success {
+      background: rgba(16, 185, 129, .1);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, .2)
+    }
+
+    .status.error {
+      background: rgba(239, 68, 68, .1);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .2)
+    }
+
+    /* ── Quick Actions ── */
+    .qa-title {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin: 16px 0 10px
+    }
+
+    .qa-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px
+    }
+
+    .qa-btn {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, .04);
+      color: var(--text);
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .qa-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(99, 102, 241, .08)
+    }
+
+    /* ── Code viewer ── */
+    .code-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px
+    }
+
+    .code-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .version-badge {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 12px;
+      background: rgba(99, 102, 241, .15);
+      color: var(--accent);
+      font-weight: 600;
+      border: 1px solid rgba(99, 102, 241, .2)
+    }
+
+    #codeBox {
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid var(--border);
+      padding: 18px;
+      overflow: auto;
+      height: 520px;
+      border-radius: 12px;
+      color: var(--code);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.7;
+      white-space: pre;
+      tab-size: 2
+    }
+
+    .placeholder {
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      text-align: center;
+      padding: 60px 20px
+    }
+
+    .placeholder .ph-icon {
+      font-size: 48px;
+      margin-bottom: 12px
+    }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex;
+      gap: 16px;
+      margin-top: 10px;
+      flex-wrap: wrap
+    }
+
+    .stat {
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .stat strong {
+      color: var(--text);
+      font-weight: 600
+    }
+
+    /* ── History sidebar ── */
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-top: 10px
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      background: rgba(255, 255, 255, .03)
+    }
+
+    .history-item .v {
+      min-width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, .15);
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 11px
+    }
+
+    .history-item .instr {
+      flex: 1;
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .history-item .ts {
+      color: var(--muted);
+      flex-shrink: 0
+    }
+
+    .history-item.current {
+      border-color: rgba(99, 102, 241, .4);
+      background: rgba(99, 102, 241, .07)
+    }
+
+    /* ── Spinner ── */
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      flex-shrink: 0
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 3px
+    }
+  </style>
 </head>
+
 <body>
-<div class="wrap">
+  <div class="wrap">
 
-  <!-- Header -->
-  <header>
-    <div class="logo">
-      <div class="logo-icon">✍️</div>
-      <div class="logo-text">
-        <h1>AI Resume Editor</h1>
-        <p>Local · Powered by phi3:mini · No cloud required</p>
-      </div>
-    </div>
-    <div id="connBadge"><div class="dot"></div><span id="connText">Checking...</span></div>
-  </header>
-
-  <div class="layout">
-
-    <!-- ── LEFT PANEL ── -->
-    <div style="display:flex;flex-direction:column;gap:16px">
-
-      <!-- Step 1: Load -->
-      <div class="card">
-        <div class="card-title"><span>📂</span> Step 1 — Load Resume</div>
-
-        <div class="tabs">
-          <button class="tab active" id="tab-upload-btn" onclick="switchTab('upload')">Upload .tex File</button>
-          <button class="tab" id="tab-paste-btn" onclick="switchTab('paste')">Paste LaTeX Code</button>
+    <!-- Header -->
+    <header>
+      <div class="logo">
+        <div class="logo-icon">✍️</div>
+        <div class="logo-text">
+          <h1>AI Resume Editor</h1>
+          <p>Local · Powered by mistral 7b · No cloud required</p>
         </div>
+      </div>
+      <div id="connBadge">
+        <div class="dot"></div><span id="connText">Checking...</span>
+      </div>
+    </header>
 
-        <div id="tab-upload">
-          <input type="file" id="fileInput" accept=".tex">
-          <div class="btn-row">
-            <button class="btn btn-primary" onclick="uploadResume()">📤 Upload Resume</button>
+    <div class="layout">
+
+      <!-- ── LEFT PANEL ── -->
+      <div style="display:flex;flex-direction:column;gap:16px">
+
+        <!-- Step 1: Load -->
+        <div class="card">
+          <div class="card-title"><span>📂</span> Step 1 — Load Resume</div>
+
+          <div class="tabs">
+            <button class="tab active" id="tab-upload-btn" onclick="switchTab('upload')">Upload .tex File</button>
+            <button class="tab" id="tab-paste-btn" onclick="switchTab('paste')">Paste LaTeX Code</button>
           </div>
-          <p id="uploadStatus" class="status"></p>
-        </div>
 
-        <div id="tab-paste" style="display:none">
-          <textarea id="pasteInput" rows="10" placeholder="Paste your LaTeX code here...&#10;&#10;\documentclass{article}&#10;\begin{document}&#10;...&#10;\end{document}"></textarea>
-          <div class="btn-row">
-            <button class="btn btn-primary" onclick="pasteResume()">✅ Load Code</button>
+          <div id="tab-upload">
+            <input type="file" id="fileInput" accept=".tex">
+            <div class="btn-row">
+              <button class="btn btn-primary" onclick="uploadResume()">📤 Upload Resume</button>
+            </div>
+            <p id="uploadStatus" class="status"></p>
           </div>
-          <p id="pasteStatus" class="status"></p>
+
+          <div id="tab-paste" style="display:none">
+            <textarea id="pasteInput" rows="10"
+              placeholder="Paste your LaTeX code here...&#10;&#10;\documentclass{article}&#10;\begin{document}&#10;...&#10;\end{document}"></textarea>
+            <div class="btn-row">
+              <button class="btn btn-primary" onclick="pasteResume()">✅ Load Code</button>
+            </div>
+            <p id="pasteStatus" class="status"></p>
+          </div>
         </div>
+
+        <!-- Step 2: Edit -->
+        <div class="card">
+          <div class="card-title"><span>🤖</span> Step 2 — AI Edit</div>
+
+          <textarea id="instruction" rows="4"
+            placeholder="Describe what you want to change...&#10;&#10;Examples:&#10;• Make it more professional and concise&#10;• Rewrite experience section for a data science role&#10;• Add a Projects section after Skills"></textarea>
+
+          <div class="qa-title">⚡ Quick Actions</div>
+          <div class="qa-grid">
+            <button class="qa-btn" onclick="quickAction('Make the resume more professional and polished')">More
+              Professional</button>
+            <button class="qa-btn"
+              onclick="quickAction('Tailor this resume for a software engineer role at a top tech company')">Software
+              Engineer</button>
+            <button class="qa-btn"
+              onclick="quickAction('Tailor this resume for a data science or ML engineer role')">Data Science /
+              ML</button>
+            <button class="qa-btn"
+              onclick="quickAction('Make all technology names, programming languages, and tools bold')">Bold
+              Technologies</button>
+            <button class="qa-btn"
+              onclick="quickAction('Rewrite all bullet points to start with strong action verbs and quantify achievements')">Stronger
+              Bullets</button>
+            <button class="qa-btn" onclick="quickAction('Fix any grammar, spelling, and formatting issues')">Fix
+              Grammar</button>
+            <button class="qa-btn"
+              onclick="quickAction('Make the resume more concise and remove redundant information')">Make
+              Concise</button>
+            <button class="qa-btn" onclick="quickAction('Add a compelling professional summary at the top')">Add
+              Summary</button>
+          </div>
+
+          <div class="btn-row" style="margin-top:18px">
+            <button class="btn btn-primary" id="editBtn" onclick="editResume()">🚀 Edit with AI</button>
+            <button class="btn btn-ghost" id="undoBtn" onclick="undoEdit()" disabled>↩ Undo</button>
+            <button class="btn btn-danger" id="resetBtn" onclick="resetResume()" disabled>🔄 Reset</button>
+          </div>
+          <p id="editStatus" class="status"></p>
+        </div>
+
+        <!-- History -->
+        <div class="card" id="historyCard" style="display:none">
+          <div class="card-title"><span>📋</span> Edit History</div>
+          <div class="history-list" id="historyList"></div>
+        </div>
+
       </div>
 
-      <!-- Step 2: Edit -->
-      <div class="card">
-        <div class="card-title"><span>🤖</span> Step 2 — AI Edit</div>
-
-        <textarea id="instruction" rows="4" placeholder="Describe what you want to change...&#10;&#10;Examples:&#10;• Make it more professional and concise&#10;• Rewrite experience section for a data science role&#10;• Add a Projects section after Skills"></textarea>
-
-        <div class="qa-title">⚡ Quick Actions</div>
-        <div class="qa-grid">
-          <button class="qa-btn" onclick="quickAction('Make the resume more professional and polished')">More Professional</button>
-          <button class="qa-btn" onclick="quickAction('Tailor this resume for a software engineer role at a top tech company')">Software Engineer</button>
-          <button class="qa-btn" onclick="quickAction('Tailor this resume for a data science or ML engineer role')">Data Science / ML</button>
-          <button class="qa-btn" onclick="quickAction('Make all technology names, programming languages, and tools bold')">Bold Technologies</button>
-          <button class="qa-btn" onclick="quickAction('Rewrite all bullet points to start with strong action verbs and quantify achievements')">Stronger Bullets</button>
-          <button class="qa-btn" onclick="quickAction('Fix any grammar, spelling, and formatting issues')">Fix Grammar</button>
-          <button class="qa-btn" onclick="quickAction('Make the resume more concise and remove redundant information')">Make Concise</button>
-          <button class="qa-btn" onclick="quickAction('Add a compelling professional summary at the top')">Add Summary</button>
+      <!-- ── RIGHT PANEL ── -->
+      <div class="card" style="position:sticky;top:24px">
+        <div class="code-header">
+          <div class="card-title" style="margin:0"><span>📄</span> LaTeX Code</div>
+          <div class="code-meta">
+            <span class="version-badge" id="versionBadge" style="display:none">v0</span>
+            <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px" onclick="copyCode()">📋 Copy</button>
+            <button class="btn btn-success" style="padding:7px 14px;font-size:13px" id="dlBtn" onclick="downloadTex()"
+              disabled>⬇ Download</button>
+          </div>
         </div>
 
-        <div class="btn-row" style="margin-top:18px">
-          <button class="btn btn-primary" id="editBtn" onclick="editResume()">🚀 Edit with AI</button>
-          <button class="btn btn-ghost" id="undoBtn" onclick="undoEdit()" disabled>↩ Undo</button>
-          <button class="btn btn-danger" id="resetBtn" onclick="resetResume()" disabled>🔄 Reset</button>
-        </div>
-        <p id="editStatus" class="status"></p>
-      </div>
+        <pre
+          id="codeBox"><div class="placeholder"><div class="ph-icon">📝</div>Your LaTeX code will appear here<br><small style="color:var(--muted);font-size:12px;margin-top:6px;display:block">Upload or paste a .tex file to get started</small></div></pre>
 
-      <!-- History -->
-      <div class="card" id="historyCard" style="display:none">
-        <div class="card-title"><span>📋</span> Edit History</div>
-        <div class="history-list" id="historyList"></div>
+        <div class="stats-bar" id="statsBar" style="display:none">
+          <div class="stat">Lines: <strong id="statLines">0</strong></div>
+          <div class="stat">Chars: <strong id="statChars">0</strong></div>
+          <div class="stat">Size: <strong id="statSize">0 KB</strong></div>
+        </div>
       </div>
 
     </div>
-
-    <!-- ── RIGHT PANEL ── -->
-    <div class="card" style="position:sticky;top:24px">
-      <div class="code-header">
-        <div class="card-title" style="margin:0"><span>📄</span> LaTeX Code</div>
-        <div class="code-meta">
-          <span class="version-badge" id="versionBadge" style="display:none">v0</span>
-          <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px" onclick="copyCode()">📋 Copy</button>
-          <button class="btn btn-success" style="padding:7px 14px;font-size:13px" id="dlBtn" onclick="downloadTex()" disabled>⬇ Download</button>
-        </div>
-      </div>
-
-      <pre id="codeBox"><div class="placeholder"><div class="ph-icon">📝</div>Your LaTeX code will appear here<br><small style="color:var(--muted);font-size:12px;margin-top:6px;display:block">Upload or paste a .tex file to get started</small></div></pre>
-
-      <div class="stats-bar" id="statsBar" style="display:none">
-        <div class="stat">Lines: <strong id="statLines">0</strong></div>
-        <div class="stat">Chars: <strong id="statChars">0</strong></div>
-        <div class="stat">Size: <strong id="statSize">0 KB</strong></div>
-      </div>
-    </div>
-
   </div>
-</div>
 
-<script>
-const API = 'http://localhost:8000';
-let resumeId = null;
-let currentVersion = 0;
-let totalVersions = 0;
+  <script>
+    const API = 'http://localhost:8000';
+    let resumeId = null;
+    let currentVersion = 0;
+    let totalVersions = 0;
 
-// ── Tab Switching ────────────────────────────────────────────────
-function switchTab(name) {
-  document.getElementById('tab-upload').style.display = name === 'upload' ? '' : 'none';
-  document.getElementById('tab-paste').style.display  = name === 'paste'  ? '' : 'none';
-  document.getElementById('tab-upload-btn').classList.toggle('active', name === 'upload');
-  document.getElementById('tab-paste-btn').classList.toggle('active',  name === 'paste');
-}
+    // ── Tab Switching ────────────────────────────────────────────────
+    function switchTab(name) {
+      document.getElementById('tab-upload').style.display = name === 'upload' ? '' : 'none';
+      document.getElementById('tab-paste').style.display = name === 'paste' ? '' : 'none';
+      document.getElementById('tab-upload-btn').classList.toggle('active', name === 'upload');
+      document.getElementById('tab-paste-btn').classList.toggle('active', name === 'paste');
+    }
 
-// ── Quick Action ─────────────────────────────────────────────────
-function quickAction(text) {
-  document.getElementById('instruction').value = text;
-  document.getElementById('instruction').focus();
-}
+    // ── Quick Action ─────────────────────────────────────────────────
+    function quickAction(text) {
+      document.getElementById('instruction').value = text;
+      document.getElementById('instruction').focus();
+    }
 
-// ── Upload File ──────────────────────────────────────────────────
-async function uploadResume() {
-  const file = document.getElementById('fileInput').files[0];
-  if (!file) { alert('Please select a .tex file first'); return; }
-  const fd = new FormData();
-  fd.append('file', file);
-  showStatus('uploadStatus', '⏳ Uploading...', 'loading');
-  try {
-    const r = await fetch(`${API}/upload`, { method: 'POST', body: fd });
-    const d = await r.json();
-    resumeId = d.resume_id;
-    showStatus('uploadStatus', `✅ Loaded: ${file.name}`, 'success');
-    await refreshCode();
-    enableControls();
-  } catch(e) { showStatus('uploadStatus', `❌ Error: ${e}`, 'error'); }
-}
+    // ── Upload File ──────────────────────────────────────────────────
+    async function uploadResume() {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) { alert('Please select a .tex file first'); return; }
+      const fd = new FormData();
+      fd.append('file', file);
+      showStatus('uploadStatus', '⏳ Uploading...', 'loading');
+      try {
+        const r = await fetch(`${API}/upload`, { method: 'POST', body: fd });
+        const d = await r.json();
+        resumeId = d.resume_id;
+        showStatus('uploadStatus', `✅ Loaded: ${file.name}`, 'success');
+        await refreshCode();
+        enableControls();
+      } catch (e) { showStatus('uploadStatus', `❌ Error: ${e}`, 'error'); }
+    }
 
-// ── Paste Code ───────────────────────────────────────────────────
-async function pasteResume() {
-  const code = document.getElementById('pasteInput').value.trim();
-  if (!code) { alert('Please paste your LaTeX code first'); return; }
-  showStatus('pasteStatus', '⏳ Loading...', 'loading');
-  try {
-    const r = await fetch(`${API}/paste`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ latex_code: code })
-    });
-    const d = await r.json();
-    resumeId = d.resume_id;
-    showStatus('pasteStatus', '✅ Code loaded successfully!', 'success');
-    await refreshCode();
-    enableControls();
-  } catch(e) { showStatus('pasteStatus', `❌ Error: ${e}`, 'error'); }
-}
+    // ── Paste Code ───────────────────────────────────────────────────
+    async function pasteResume() {
+      const code = document.getElementById('pasteInput').value.trim();
+      if (!code) { alert('Please paste your LaTeX code first'); return; }
+      showStatus('pasteStatus', '⏳ Loading...', 'loading');
+      try {
+        const r = await fetch(`${API}/paste`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ latex_code: code })
+        });
+        const d = await r.json();
+        resumeId = d.resume_id;
+        showStatus('pasteStatus', '✅ Code loaded successfully!', 'success');
+        await refreshCode();
+        enableControls();
+      } catch (e) { showStatus('pasteStatus', `❌ Error: ${e}`, 'error'); }
+    }
 
-// ── Edit ─────────────────────────────────────────────────────────
-async function editResume() {
-  if (!resumeId) { alert('Please load a resume first!'); return; }
-  const instr = document.getElementById('instruction').value.trim();
-  if (!instr) { alert('Please enter an instruction'); return; }
+    // ── Edit ─────────────────────────────────────────────────────────
+    async function editResume() {
+      if (!resumeId) { alert('Please load a resume first!'); return; }
+      const instr = document.getElementById('instruction').value.trim();
+      if (!instr) { alert('Please enter an instruction'); return; }
 
-  const btn = document.getElementById('editBtn');
-  btn.innerHTML = '<div class="spinner"></div> AI Editing...';
-  btn.disabled = true;
-  showStatus('editStatus', '⏳ AI is editing your resume… This can take 3–5 minutes for complex changes.', 'loading');
+      const btn = document.getElementById('editBtn');
+      btn.innerHTML = '<div class="spinner"></div> AI Editing...';
+      btn.disabled = true;
+      showStatus('editStatus', '⏳ AI is editing your resume… This can take 3–5 minutes for complex changes.', 'loading');
 
-  try {
-    const r = await fetch(`${API}/edit`, {
-      method: 'POST', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ resume_id: resumeId, instruction: instr })
-    });
-    const d = await r.json();
-    setCode(d.latex_code, d.version, d.total_versions);
-    document.getElementById('instruction').value = '';
-    showStatus('editStatus', `✅ Edit applied: "${instr}"`, 'success');
-    await refreshHistory();
-  } catch(e) {
-    showStatus('editStatus', `❌ Error: ${e}`, 'error');
-  } finally {
-    btn.innerHTML = '🚀 Edit with AI';
-    btn.disabled = false;
-  }
-}
+      try {
+        const r = await fetch(`${API}/edit`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ resume_id: resumeId, instruction: instr })
+        });
+        const d = await r.json();
+        setCode(d.latex_code, d.version, d.total_versions);
+        document.getElementById('instruction').value = '';
+        showStatus('editStatus', `✅ Edit applied: "${instr}"`, 'success');
+        await refreshHistory();
+      } catch (e) {
+        showStatus('editStatus', `❌ Error: ${e}`, 'error');
+      } finally {
+        btn.innerHTML = '🚀 Edit with AI';
+        btn.disabled = false;
+      }
+    }
 
-// ── Undo ─────────────────────────────────────────────────────────
-async function undoEdit() {
-  if (!resumeId) return;
-  try {
-    const r = await fetch(`${API}/undo/${resumeId}`, { method: 'POST' });
-    if (!r.ok) { const e = await r.json(); alert(e.detail); return; }
-    const d = await r.json();
-    setCode(d.latex_code, d.version, d.total_versions);
-    showStatus('editStatus', `↩ Undone — back to: "${d.instruction}"`, 'success');
-    await refreshHistory();
-  } catch(e) { showStatus('editStatus', `❌ Error: ${e}`, 'error'); }
-}
+    // ── Undo ─────────────────────────────────────────────────────────
+    async function undoEdit() {
+      if (!resumeId) return;
+      try {
+        const r = await fetch(`${API}/undo/${resumeId}`, { method: 'POST' });
+        if (!r.ok) { const e = await r.json(); alert(e.detail); return; }
+        const d = await r.json();
+        setCode(d.latex_code, d.version, d.total_versions);
+        showStatus('editStatus', `↩ Undone — back to: "${d.instruction}"`, 'success');
+        await refreshHistory();
+      } catch (e) { showStatus('editStatus', `❌ Error: ${e}`, 'error'); }
+    }
 
-// ── Reset ─────────────────────────────────────────────────────────
-async function resetResume() {
-  if (!resumeId) return;
-  if (!confirm('Reset to original? All edits will be lost!')) return;
-  try {
-    const r = await fetch(`${API}/reset/${resumeId}`, { method: 'POST' });
-    const d = await r.json();
-    setCode(d.latex_code, d.version, d.total_versions);
-    showStatus('editStatus', '🔄 Reset to original!', 'success');
-    await refreshHistory();
-  } catch(e) { showStatus('editStatus', `❌ Error: ${e}`, 'error'); }
-}
+    // ── Reset ─────────────────────────────────────────────────────────
+    async function resetResume() {
+      if (!resumeId) return;
+      if (!confirm('Reset to original? All edits will be lost!')) return;
+      try {
+        const r = await fetch(`${API}/reset/${resumeId}`, { method: 'POST' });
+        const d = await r.json();
+        setCode(d.latex_code, d.version, d.total_versions);
+        showStatus('editStatus', '🔄 Reset to original!', 'success');
+        await refreshHistory();
+      } catch (e) { showStatus('editStatus', `❌ Error: ${e}`, 'error'); }
+    }
 
-// ── Copy ──────────────────────────────────────────────────────────
-function copyCode() {
-  const code = document.getElementById('codeBox').textContent;
-  if (!code || code.includes('LaTeX code will appear')) { alert('No code to copy!'); return; }
-  navigator.clipboard.writeText(code).then(() => {
-    showStatus('editStatus', '📋 Code copied to clipboard!', 'success');
-  });
-}
+    // ── Copy ──────────────────────────────────────────────────────────
+    function copyCode() {
+      const code = document.getElementById('codeBox').textContent;
+      if (!code || code.includes('LaTeX code will appear')) { alert('No code to copy!'); return; }
+      navigator.clipboard.writeText(code).then(() => {
+        showStatus('editStatus', '📋 Code copied to clipboard!', 'success');
+      });
+    }
 
-// ── Download .tex ─────────────────────────────────────────────────
-function downloadTex() {
-  if (!resumeId) return;
-  window.open(`${API}/download/${resumeId}`, '_blank');
-}
+    // ── Download .tex ─────────────────────────────────────────────────
+    function downloadTex() {
+      if (!resumeId) return;
+      window.open(`${API}/download/${resumeId}`, '_blank');
+    }
 
-// ── Helpers ───────────────────────────────────────────────────────
-async function refreshCode() {
-  if (!resumeId) return;
-  const r = await fetch(`${API}/resume/${resumeId}`);
-  const d = await r.json();
-  setCode(d.latex_code, d.version, d.total_versions);
-  await refreshHistory();
-}
+    // ── Helpers ───────────────────────────────────────────────────────
+    async function refreshCode() {
+      if (!resumeId) return;
+      const r = await fetch(`${API}/resume/${resumeId}`);
+      const d = await r.json();
+      setCode(d.latex_code, d.version, d.total_versions);
+      await refreshHistory();
+    }
 
-function setCode(code, version, total) {
-  currentVersion = version;
-  totalVersions = total;
-  document.getElementById('codeBox').textContent = code;
-  document.getElementById('versionBadge').textContent = `v${version}`;
-  document.getElementById('versionBadge').style.display = '';
+    function setCode(code, version, total) {
+      currentVersion = version;
+      totalVersions = total;
+      document.getElementById('codeBox').textContent = code;
+      document.getElementById('versionBadge').textContent = `v${version}`;
+      document.getElementById('versionBadge').style.display = '';
 
-  // Stats
-  const lines = code.split('\n').length;
-  const chars = code.length;
-  const size = (new Blob([code]).size / 1024).toFixed(1);
-  document.getElementById('statLines').textContent = lines;
-  document.getElementById('statChars').textContent = chars.toLocaleString();
-  document.getElementById('statSize').textContent = `${size} KB`;
-  document.getElementById('statsBar').style.display = 'flex';
+      // Stats
+      const lines = code.split('\n').length;
+      const chars = code.length;
+      const size = (new Blob([code]).size / 1024).toFixed(1);
+      document.getElementById('statLines').textContent = lines;
+      document.getElementById('statChars').textContent = chars.toLocaleString();
+      document.getElementById('statSize').textContent = `${size} KB`;
+      document.getElementById('statsBar').style.display = 'flex';
 
-  // Undo button
-  document.getElementById('undoBtn').disabled = version <= 0;
+      // Undo button
+      document.getElementById('undoBtn').disabled = version <= 0;
 
-  // Reset button — enable only when there are edits beyond original
-  document.getElementById('resetBtn').disabled = total <= 1;
-}
+      // Reset button — enable only when there are edits beyond original
+      document.getElementById('resetBtn').disabled = total <= 1;
+    }
 
-async function refreshHistory() {
-  if (!resumeId) return;
-  try {
-    const r = await fetch(`${API}/history/${resumeId}`);
-    const d = await r.json();
-    const list = document.getElementById('historyList');
-    list.innerHTML = '';
-    [...d.history].reverse().forEach((h, i) => {
-      const idx = d.total_versions - 1 - i;
-      const isCurrent = idx === currentVersion;
-      const ts = new Date(h.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-      list.innerHTML += `<div class="history-item ${isCurrent ? 'current' : ''}">
+    async function refreshHistory() {
+      if (!resumeId) return;
+      try {
+        const r = await fetch(`${API}/history/${resumeId}`);
+        const d = await r.json();
+        const list = document.getElementById('historyList');
+        list.innerHTML = '';
+        [...d.history].reverse().forEach((h, i) => {
+          const idx = d.total_versions - 1 - i;
+          const isCurrent = idx === currentVersion;
+          const ts = new Date(h.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          list.innerHTML += `<div class="history-item ${isCurrent ? 'current' : ''}">
         <div class="v">${h.version}</div>
         <div class="instr">${h.instruction}</div>
         <div class="ts">${ts}</div>
       </div>`;
-    });
-    document.getElementById('historyCard').style.display = d.total_versions > 1 ? '' : 'none';
-  } catch(e) {}
-}
-
-function enableControls() {
-  document.getElementById('resetBtn').disabled = false;
-  document.getElementById('dlBtn').disabled = false;
-}
-
-function showStatus(id, msg, type) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = `status ${type}`;
-  el.style.display = 'block';
-  if (type === 'success') setTimeout(() => { if(el.className.includes('success')) el.style.display='none'; }, 4000);
-}
-
-// ── Connection Check ──────────────────────────────────────────────
-async function checkConn() {
-  const badge = document.getElementById('connBadge');
-  const txt = document.getElementById('connText');
-  try {
-    const r = await fetch(`${API}/api/health`);
-    const d = await r.json();
-    if (d.status === 'ok') {
-      badge.className = 'ok'; txt.textContent = 'phi3:mini ready';
-    } else {
-      badge.className = 'err'; txt.textContent = 'Ollama not connected';
+        });
+        document.getElementById('historyCard').style.display = d.total_versions > 1 ? '' : 'none';
+      } catch (e) { }
     }
-  } catch {
-    badge.className = 'err'; txt.textContent = 'Backend offline';
-  }
-}
 
-checkConn();
-setInterval(checkConn, 15000);
-</script>
+    function enableControls() {
+      document.getElementById('resetBtn').disabled = false;
+      document.getElementById('dlBtn').disabled = false;
+    }
+
+    function showStatus(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = `status ${type}`;
+      el.style.display = 'block';
+      if (type === 'success') setTimeout(() => { if (el.className.includes('success')) el.style.display = 'none'; }, 4000);
+    }
+
+    // ── Connection Check ──────────────────────────────────────────────
+    async function checkConn() {
+      const badge = document.getElementById('connBadge');
+      const txt = document.getElementById('connText');
+      try {
+        const r = await fetch(`${API}/api/health`);
+        const d = await r.json();
+        if (d.status === 'ok') {
+          badge.className = 'ok'; txt.textContent = 'phi3:mini ready';
+        } else {
+          badge.className = 'err'; txt.textContent = 'Ollama not connected';
+        }
+      } catch {
+        badge.className = 'err'; txt.textContent = 'Backend offline';
+      }
+    }
+
+    checkConn();
+    setInterval(checkConn, 15000);
+  </script>
 </body>
+
 </html>
