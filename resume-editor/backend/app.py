@@ -537,7 +537,7 @@ ORIGINAL LATEX CODE:
     try:
         print("AI processing (this may take 2-4 mins for large resumes)...", end="", flush=True)
         response = ollama.generate(
-            model='mistral',
+            model='qwen2.5:3b',
             prompt=prompt,
             stream=False,
             options={

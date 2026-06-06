@@ -553,6 +553,75 @@
       background: var(--border);
       border-radius: 3px
     }
+
+    /* ── Toast Notifications ── */
+    .toast {
+      background: rgba(26, 29, 46, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      color: var(--text);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      min-width: 320px;
+      max-width: 450px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), fadeOut 0.3s forwards;
+      animation-delay: 0s, 5.7s;
+      z-index: 10000;
+      pointer-events: auto;
+    }
+    
+    .toast.toast-error {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(30, 20, 25, 0.95);
+    }
+    
+    .toast.toast-warning {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(30, 25, 20, 0.95);
+    }
+
+    .toast-icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .toast-content {
+      flex: 1;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    
+    .toast-title.title-error {
+      color: var(--red);
+    }
+    
+    .toast-title.title-warning {
+      color: var(--yellow);
+    }
+
+    .toast-desc {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateY(10px); }
+    }
   </style>
 </head>
 
@@ -565,7 +634,7 @@
         <div class="logo-icon">✍️</div>
         <div class="logo-text">
           <h1>AI Resume Editor</h1>
-          <p>Local · Powered by mistral 7b · No cloud required</p>
+          <p>Local · Powered by qwen2.5:3b · No cloud required</p>
         </div>
       </div>
       <div id="connBadge">
@@ -744,18 +813,34 @@
       btn.disabled = true;
       showStatus('editStatus', '⏳ AI is editing your resume… This can take 3–5 minutes for complex changes.', 'loading');
 
+      const oldCode = document.getElementById('codeBox').textContent;
+
       try {
         const r = await fetch(`${API}/edit`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ resume_id: resumeId, instruction: instr })
         });
         const d = await r.json();
+        
         setCode(d.latex_code, d.version, d.total_versions);
         document.getElementById('instruction').value = '';
-        showStatus('editStatus', `✅ Edit applied: "${instr}"`, 'success');
+        
+        const unchanged = oldCode === d.latex_code;
+        
+        if (d.message && d.message !== 'Done') {
+          showStatus('editStatus', `⚠️ Warning: ${d.message}`, 'error');
+          showToast('Edit Warning', d.message, 'warning');
+        } else if (unchanged) {
+          const fallbackMsg = 'The edit instruction did not change the resume. If this was a fallback, check the terminal or rephrase the command.';
+          showStatus('editStatus', `⚠️ No changes made.`, 'error');
+          showToast('No Changes Made', fallbackMsg, 'warning');
+        } else {
+          showStatus('editStatus', `✅ Edit applied: "${instr}"`, 'success');
+        }
         await refreshHistory();
       } catch (e) {
         showStatus('editStatus', `❌ Error: ${e}`, 'error');
+        showToast('Error', e.message || 'An error occurred during editing.', 'error');
       } finally {
         btn.innerHTML = '🚀 Edit with AI';
         btn.disabled = false;
@@ -877,7 +962,7 @@
         const r = await fetch(`${API}/api/health`);
         const d = await r.json();
         if (d.status === 'ok') {
-          badge.className = 'ok'; txt.textContent = 'phi3:mini ready';
+          badge.className = 'ok'; txt.textContent = 'qwen2.5:3b ready';
         } else {
           badge.className = 'err'; txt.textContent = 'Ollama not connected';
         }
@@ -886,9 +971,36 @@
       }
     }
 
+    // ── Toast System ──────────────────────────────────────────────────
+    function showToast(title, desc, type = 'warning') {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      
+      const icon = type === 'error' ? '❌' : '⚠️';
+      
+      toast.innerHTML = `
+        <span class="toast-icon">${icon}</span>
+        <div class="toast-content">
+          <div class="toast-title title-${type}">${title}</div>
+          <div class="toast-desc">${desc}</div>
+        </div>
+      `;
+      
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.animation = 'fadeOut 0.3s forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 5700);
+    }
+
     checkConn();
     setInterval(checkConn, 15000);
   </script>
+  
+  <!-- Toast Container -->
+  <div id="toastContainer" style="position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 10000; pointer-events: none;"></div>
 </body>
 
 </html>
